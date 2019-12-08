@@ -1,0 +1,35 @@
+#!/bin/sh
+# switch to "dark menu bar and dock" mode / back again
+# usage `./semidark [-mode] (-ui)
+#                   -s  * dark menu bar and dock
+#                 ( -ui * set notification center / spotlight to dark as well )
+# 	            -f  * full dark mode (mojave standard)
+# 	            -f2 * full dark mode alt. approach if not working
+# Alexander leris DEC/19
+
+function dark_ui() {
+         defaults write com.apple.Spotlight NSRequiresAquaSystemAppearance -bool No
+         defaults write com.apple.notificationcenterui NSRequiresAquaSystemAppearance -bool No
+}
+
+if [ "$1" = "-s" ]; then
+     defaults write -g NSRequiresAquaSystemAppearance -bool Yes
+
+     if [ "$2" = "-ui" ]; then
+	dark_ui
+     fi
+elif [ "$1" = "-f" ] || [ "$1" = "-f2" ]; then   # set to dark
+    # reset spotlight and notification center
+    defaults write com.apple.Spotlight NSRequiresAquaSystemAppearance -bool Yes
+    defaults write com.apple.notificationcenterui NSRequiresAquaSystemAppearance -bool Yes
+
+    # set to full dark
+    if [ "$1" = "-f" ]; then
+	defaults write -g NSRequiresAquaSystemAppearance -bool No
+    else  # alt full dark option
+	defaults delete -g NSRequiresAquaSystemAppearance
+    fi
+fi
+
+# logout
+osascript -e 'tell app "System Events" to log out'
